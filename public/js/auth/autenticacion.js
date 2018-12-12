@@ -7,12 +7,29 @@ class Autenticacion {
   }
 
   crearCuentaEmailPass (email, password, nombres) {
-    /*Materialize.toast(
-      `Bienvenido ${nombres}, debes realizar el proceso de verificación`,
-      4000
-    )
+    firebase.auth().createUserWithEmailAndPassword(email, password)
+    .then(result => {
+      result.user.updateProfile({
+        displayname: nombres
+      })
 
-    $('.modal').modal('close')*/
+      const configuracion = {
+        url: 'http://localhost:3000/'
+      }
+
+      result.user.sendEmailVerification(configuracion).catch(error)
+
+      firebase.auth().signOut()
+
+      Materialize.toast(
+        `Bienvenido ${nombres}, debes realizar el proceso de verificación`,
+        4000
+      )
+
+      $('.modal').modal('close')
+
+    }).catch(error)
+
     
   }
 
@@ -31,4 +48,10 @@ class Autenticacion {
   authTwitter () {
     // TODO: Crear auth con twitter
   }
+
+  error = err =>{
+    console.error(error)
+    Materualize.toast(error.message, 4000)
+  }
+
 }
