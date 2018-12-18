@@ -1,6 +1,6 @@
 # VideoBlog-Firebase
 
-Create public/js/config/ConfigFirebase.js
+**Create** *public/js/config/ConfigFirebase.js*
 
 ```
 var config = {
