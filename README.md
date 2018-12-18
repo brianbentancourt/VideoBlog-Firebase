@@ -2,6 +2,7 @@
 
 Create public/js/config/ConfigFirebase.js
 
+```
 var config = {
     apiKey: "...",
     authDomain: "...",
@@ -9,4 +10,5 @@ var config = {
     projectId: "...",
     storageBucket: "...",
     messagingSenderId: "..."
-  };
+  }
+```
