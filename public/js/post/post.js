@@ -1,23 +1,73 @@
 class Post {
-  constructor () {
-      // TODO inicializar firestore y settings
+    constructor() {
+        this.db = firebase.firestore()
+        // estas configuraciones son para convertir datetime a timestamp 
+        const settings = { 'timestampsInSnapshots': true }
+        this.db.settings(settings)
 
-  }
+    }
 
-  crearPost (uid, emailUser, titulo, descripcion, imagenLink, videoLink) {
-    
-  }
+    crearPost(uid, emailUser, titulo, descripcion, imagenLink, videoLink) {
+        // this.db.collection('post').doc('key').set({})
+        return this.db.collection('post').add({
+            uid,
+            autor: emailUser,
+            titulo,
+            descripcion,
+            imagenLink,
+            videoLink,
+            fecha: firebase.firestore.FieldValue.serverTimestamp()
+        })
+            .then(refDoc => {
+                console.log(`Post ID: ${refDoc.id}`)
+            })
+            .catch(error => console.error(error))
+    }
 
-  consultarTodosPost () {
-    
-  }
+    consultarTodosPost() {
+        this.db.collection('post').onSnapshot(querySnapshot => {
+            $('#posts').empty()
+            if (querySnapshot.empty) {
+                $('#posts').append(this.obtenerTemplatePostVacio())
+            } else {
+                querySnapshot.forEach(post => {
+                    let postHtml = this.obtenerPostTemplate(
+                        post.data().autor,
+                        post.data().titulo,
+                        post.data().descripcion,
+                        post.data().videoLink,
+                        post.data().imagenLink,
+                        Utilidad.obtenerFecha(post.data().fecha.toDate())
+                    )
+                    $('#posts').append(postHtml)
+                })
+            }
+        })
+    }
 
-  consultarPostxUsuario (emailUser) {
-    
-  }
+    consultarPostxUsuario(emailUser) {
+        this.db.collection('post').where('autor', '==', emailUser).onSnapshot(querySnapshot => {
+            $('#posts').empty()
+            if (querySnapshot.empty) {
+                $('#posts').append(this.obtenerTemplatePostVacio())
+            } else {
+                querySnapshot.forEach(post => {
+                    let postHtml = this.obtenerPostTemplate(
+                        post.data().autor,
+                        post.data().titulo,
+                        post.data().descripcion,
+                        post.data().videoLink,
+                        post.data().imagenLink,
+                        Utilidad.obtenerFecha(post.data().fecha.toDate())
+                    )
+                    $('#posts').append(postHtml)
+                })
+            }
+        })
+    }
 
-  obtenerTemplatePostVacio () {
-    return `<article class="post">
+    obtenerTemplatePostVacio() {
+        return `<article class="post">
       <div class="post-titulo">
           <h5>Crea el primer Post a la comunidad</h5>
       </div>
@@ -42,18 +92,18 @@ class Post {
       <div class="post-footer container">         
       </div>
   </article>`
-  }
+    }
 
-  obtenerPostTemplate (
-    autor,
-    titulo,
-    descripcion,
-    videoLink,
-    imagenLink,
-    fecha
-  ) {
-    if (imagenLink) {
-      return `<article class="post">
+    obtenerPostTemplate(
+        autor,
+        titulo,
+        descripcion,
+        videoLink,
+        imagenLink,
+        fecha
+    ) {
+        if (imagenLink) {
+            return `<article class="post">
             <div class="post-titulo">
                 <h5>${titulo}</h5>
             </div>
@@ -85,9 +135,9 @@ class Post {
                 </div>
             </div>
         </article>`
-    }
+        }
 
-    return `<article class="post">
+        return `<article class="post">
                 <div class="post-titulo">
                     <h5>${titulo}</h5>
                 </div>
@@ -120,5 +170,5 @@ class Post {
                     </div>
                 </div>
             </article>`
-  }
+    }
 }
