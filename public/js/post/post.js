@@ -25,7 +25,10 @@ class Post {
     }
 
     consultarTodosPost() {
-        this.db.collection('post').onSnapshot(querySnapshot => {
+        this.db.collection('post')
+        .orderBy('fecha', 'asc')
+        .orderBy('titulo', 'asc')
+        .onSnapshot(querySnapshot => {
             $('#posts').empty()
             if (querySnapshot.empty) {
                 $('#posts').append(this.obtenerTemplatePostVacio())
@@ -46,7 +49,11 @@ class Post {
     }
 
     consultarPostxUsuario(emailUser) {
-        this.db.collection('post').where('autor', '==', emailUser).onSnapshot(querySnapshot => {
+        this.db.collection('post')
+        .orderBy('fecha', 'asc')
+        .orderBy('titulo', 'asc')
+        .where('autor', '==', emailUser)
+        .onSnapshot(querySnapshot => {
             $('#posts').empty()
             if (querySnapshot.empty) {
                 $('#posts').append(this.obtenerTemplatePostVacio())
@@ -63,6 +70,28 @@ class Post {
                     $('#posts').append(postHtml)
                 })
             }
+        })
+    }
+
+    subirImagenPost(file, uid){
+        const refStorage = firebase.storage().ref(`imgPosts/${uid}/${file.name}`)
+        const task = refStorage.put(file)
+        task.on('state_changed',
+        snapshot =>{
+            const porcentaje = snapshot.bytesTransferred / snapshot.totalBytes *100
+            $('.determinate').attr('style', `width: ${porcentaje}%`)
+        },
+        err =>{
+             Materialize.toast(err.message,4000)
+        },
+        () =>{
+            task.snapshot.ref
+            .getDownloadURL()
+            .then(ur =>{
+                console.log(url)
+                sessionStorage.setItem('imgNewPost', getDownloadURL)
+            })
+            .catch(err => Materialize.toast(err.message,4000))
         })
     }
 

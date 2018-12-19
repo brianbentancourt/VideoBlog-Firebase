@@ -50,13 +50,16 @@ $(() => {
   })
 
   $('#btnUploadFile').on('change', e => {
-    // TODO: Validar que el usuario esta autenticado
-
-    // Materialize.toast(`Para crear el post debes estar autenticado`, 4000)
-
     const file = e.target.files[0]
+    const post = new Post()
+    const user = firebase.auth().currentUser
 
-    // TODO: Referencia al storage
+    if(!user){
+      Materialize.toast('Para crear el post debes estar autenticado', 4000)
+      return
+    }
+    
+    post.subirImagenPost(file, user.uid)
     
   })
 })
