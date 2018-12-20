@@ -8,17 +8,17 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jggomez/blogvideos-ucc.git"
+    "url": "git+https://github.com/brianbentancourt/VideoBlog-Firebase"
   },
   "keywords": [
     "blog"
   ],
-  "author": "Juan Guillermo Gómez",
+  "author": "Brian Bentancourt",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/jggomez/blogvideos-ucc/issues"
+    "url": "https://github.com/brianbentancourt/VideoBlog-Firebase/issues"
   },
-  "homepage": "https://github.com/jggomez/blogvideos-ucc#readme",
+  "homepage": "https://github.com/brianbentancourt/VideoBlog-Firebase#readme",
   "devDependencies": {
     "browser-sync": "^2.18.8",
     "del": "^2.2.2",
