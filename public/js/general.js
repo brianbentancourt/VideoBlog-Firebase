@@ -2,14 +2,20 @@ $(() => {
   $('.tooltipped').tooltip({ delay: 50 })
   $('.modal').modal()
 
-  // Adicionar el service worker
+  // Init Firebase nuevamente
+  firebase.initializeApp(config);
 
-  navigator.serviceWorker.register('notificaciones-sw.js')
+
+  // Adicionar el service worker
+  navigator.serviceWorker
+    .register('notificaciones-sw.js')
     .then(registro => {
       console.log('service worker registrado')
-      firebase.messagin().useServiceWorker(registro)
-    }).catch(err => console.error('Error registrando service worker: ' + err))
-
+      firebase.messaging().useServiceWorker(registro)
+    })
+    .catch(error => {
+      console.error(`Error sal registrar el service worker => ${error}`)
+    })
   //  Registrar LLave publica de messaging
   const messaging = firebase.messaging()
   messaging.usePublicVapidKey(
@@ -17,24 +23,51 @@ $(() => {
   )
 
   // Solicitar permisos para las notificaciones
-  messaging.requestPermission()
+  messaging
+    .requestPermission()
     .then(() => {
       console.log('permiso otorgado')
       return messaging.getToken()
-    }).then(token => {
+    })
+    .then(token => {
+      console.log('token')
+      console.log(token)
       const db = firebase.firestore()
-      db.settings({ 'timestampsInSnapshot': true })
-      db.collection('tokens').doc(token).set({
-        token
-      }).catch(err => console.error(`Error insertando token en DB: ${err}`))
+      db.settings({ timestampsInSnapshots: true })
+      db
+        .collection('tokens')
+        .doc(token)
+        .set({
+          token: token
+        })
+        .catch(error => {
+          console.error(`Error al insertar el token en la BD => ${error}`)
+        })
+    })
+    .catch(error => {
+      console.error(`Permiso no otorgado => ${error}`)
     })
 
-  // TODO: Recibir las notificaciones cuando el usuario esta foreground
+  // Obtener el token cuando se refresca
+  messaging.onTokenRefresh(() => {
+    messaging.getToken()
+      .then(then => {
+        console.log('token se ha renovado')
+        const db = firebase.firestore()
+        db.settings({ 'timestampsInSnapshot': true })
+        db.collection('tokens').doc(token).set({
+          token
+        }).catch(err => console.error(`Error insertando token en DB: ${err}`))
+      })
+  })
 
-  // TODO: Recibir las notificaciones cuando el usuario esta background
+  // Recibir las notificaciones cuando el usuario esta foreground
+  messaging.onMessage(payload => {
+    Materialize.toast(payload.data.titulo, 6000)
+  })
 
-  // Init Firebase nuevamente
-  firebase.initializeApp(config);
+  // Recibir las notificaciones cuando el usuario esta background
+
 
   // Listening real time
   const post = new Post()
