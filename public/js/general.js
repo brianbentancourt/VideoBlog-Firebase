@@ -2,18 +2,39 @@ $(() => {
   $('.tooltipped').tooltip({ delay: 50 })
   $('.modal').modal()
 
-  // TODO: Adicionar el service worker
+  // Adicionar el service worker
 
-  // Init Firebase nuevamente
-  firebase.initializeApp(config);
+  navigator.serviceWorker.register('notificaciones-sw.js')
+    .then(registro => {
+      console.log('service worker registrado')
+      firebase.messagin().useServiceWorker(registro)
+    }).catch(err => console.error('Error registrando service worker: ' + err))
 
-  // TODO: Registrar LLave publica de messaging
+  //  Registrar LLave publica de messaging
+  const messaging = firebase.messaging()
+  messaging.usePublicVapidKey(
+    'BIYE_jrIGhcxGyBSq7ytC_06W1g0s3UOYgmKrjSWfeyWR7ZETY40dbMeWn5ODVzpvAWOovdPdYvnzlxunnP1pTg'
+  )
 
-  // TODO: Solicitar permisos para las notificaciones
+  // Solicitar permisos para las notificaciones
+  messaging.requestPermission()
+    .then(() => {
+      console.log('permiso otorgado')
+      return messaging.getToken()
+    }).then(token => {
+      const db = firebase.firestore()
+      db.settings({ 'timestampsInSnapshot': true })
+      db.collection('tokens').doc(token).set({
+        token
+      }).catch(err => console.error(`Error insertando token en DB: ${err}`))
+    })
 
   // TODO: Recibir las notificaciones cuando el usuario esta foreground
 
   // TODO: Recibir las notificaciones cuando el usuario esta background
+
+  // Init Firebase nuevamente
+  firebase.initializeApp(config);
 
   // Listening real time
   const post = new Post()
@@ -72,14 +93,14 @@ $(() => {
 
   $('#btnMisPost').click(() => {
     const user = firebase.auth().currentUser
-    if(!user){
-      Materialize.toast(`Debes estar autenticado para ver tus posts`, 4000)    
+    if (!user) {
+      Materialize.toast(`Debes estar autenticado para ver tus posts`, 4000)
       return
     }
 
     $('#tituloPost').text('Mis Posts')
     const post = new Post()
     post.consultarPostxUsuario(user.email)
-    
+
   })
 })
