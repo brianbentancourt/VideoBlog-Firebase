@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "public": "public", 
+    "public": "public",
     "ignore": [
       "firebase.json",
       "**/.*",
@@ -13,22 +13,27 @@
         "type": 301
       }
     ],
-    "rewrites": [ 
+    "rewrites": [
       {
         "source": "/**",
         "destination": "/index.html"
       }
     ],
-    "headers": [ 
+    "headers": [
       {
-        "source": "**/*.@(jpg|jpeg|gif|png)", 
-        "headers":[
+        "source": "**/*.@(jpg|jpeg|gif|png)",
+        "headers": [
           {
             "key": "Cache-Control",
             "value": "max-age=7200"
           }
         ]
       }
+    ]
+  },
+  "functions": {
+    "predeploy": [
+      "npm --prefix functions run lint"
     ]
   }
 }
