@@ -32,6 +32,7 @@ exports.validarImagenPostController = imagen => {
   .catch(error => console.error(error))
 }
 
-exports.enviarPostsSemana = (req, resp, next) => {
-  
+exports.enviarPostsSemana = topico => {
+  const post = new Posts()
+  return post.enviarPostSemana(topico)
 }

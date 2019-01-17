@@ -8,6 +8,9 @@ const analiticasController = require('./componentes/analiticas/AnaliticasControl
 const express = require('express')
 const cors = require('cors')
 
+const app = express()
+app.use(cors())
+
 admin.initializeApp()
 admin.firestore().settings({ timestampsInSnapshots: true })
 
@@ -16,6 +19,27 @@ admin.firestore().settings({ timestampsInSnapshots: true })
 // firebase functions:config:set configuration.numcelularerror="XXXX"
 // firebase functions:config:set configuration.accountsidtwilio="XXXX"
 // firebase functions:config:set configuration.authtokentwilio="XXXX"
+
+app.post('/v1', (req, resp, next) => {
+  return postsController
+    .enviarPostsSemana(req.body.data.topico)
+    .then( () => {
+      return resp.status(200).json({
+        resultado: true
+      })
+    }).catch(error => next(new Error(error.toString())))
+})
+
+app.use((error, req, res, next) => {
+  if(error){
+    console.error(error)
+    return res.status(500).json({
+      responseError: error.message
+    })
+  }
+  return console.error(error)
+})
+
 
 exports.creacionUsuario = functions.auth
   .user()
@@ -41,4 +65,4 @@ exports.validarImagen = functions.storage
   .object()
   .onFinalize(postsController.validarImagenPostController)
 
-  exports.enviarpostSemana = functions.https.onCall
+  exports.enviarPostSemana = functions.https.onRequest(app)
