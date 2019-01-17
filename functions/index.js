@@ -5,7 +5,8 @@ const notificacionController = require('./componentes/notificaciones/Notificacio
 const postsController = require('./componentes/posts/PostsController.js')
 const errorController = require('./componentes/errores/ErrorController.js')
 const analiticasController = require('./componentes/analiticas/AnaliticasController.js')
-
+const express = require('express')
+const cors = require('cors')
 
 admin.initializeApp()
 admin.firestore().settings({ timestampsInSnapshots: true })
@@ -40,3 +41,4 @@ exports.validarImagen = functions.storage
   .object()
   .onFinalize(postsController.validarImagenPostController)
 
+  exports.enviarpostSemana = functions.https.onCall
