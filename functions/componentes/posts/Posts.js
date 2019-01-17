@@ -3,7 +3,7 @@ const functions = require('firebase-functions')
 const path = require('path')
 const os = require('os')
 const fs = require('fs')
-//const vision = require('@google-cloud/vision')
+const vision = require('@google-cloud/vision')
 const { Email } = require('./../utilidad/EmailHelper.js')
 const plantillas = require('./../utilidad/PlantillasEmail.js')
 const { Notificaciones } = require('./../notificaciones/Notificaciones.js')
@@ -14,6 +14,36 @@ class Posts {
   }
 
   validarImagenPost (archivo) {
+    const rutaArchivo = archivo.name
+    const nombreArchivo = path.basename(rutaArchivo)
+    const idPost = path.basename(rutaArchivo).split('.')[0]
+    const bucket = admin.storage.bucket()
+    const tmpRutaArchivo = path.join(os.tmpdir(), nombreArchivo)
+
+    const cliente = new vision.ImageAnnotatorClient()
+    return bucket.file(rutaArchivo)
+      .download({ destination: tmpRutaArchivo })
+      .then(() => {
+        return cliente.safeSearchDetection(tmpRutaArchivo)
+      })
+      .then(resultado => {
+        const adulto = resultado[0].safeSearchAnnotation.adult
+        const violenta = resultado[0].safeSearchAnnotation.violence
+        const medico = resultado[0].safeSearchAnnotation.medical
+
+        return (
+          this.esAdecuada(adulto) &&
+          this.esAdecuada(violenta) &&
+          this.esAdecuada(medico)
+        )
+      })
+      .then(resp => {
+        if(resp){
+          this.actualizarEstadoPost(idPost, true)
+          return resp
+        }
+        return this.enviarNotRespImagenInapropiada(idPost)
+      })
   }
 
   esAdecuada (resultado) {

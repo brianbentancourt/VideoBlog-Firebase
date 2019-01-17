@@ -6,6 +6,7 @@ const postsController = require('./componentes/posts/PostsController.js')
 const errorController = require('./componentes/errores/ErrorController.js')
 const analiticasController = require('./componentes/analiticas/AnaliticasController.js')
 
+
 admin.initializeApp()
 admin.firestore().settings({ timestampsInSnapshots: true })
 
@@ -26,3 +27,16 @@ exports.eliminacionUsuario = functions.auth
 exports.creacionUsuarioCRM = functions.auth
   .user()
   .onCreate(usuarioController.creacionUsuarioCRM)
+
+exports.registrarTopico = functions.firestore
+  .document('/tokens/{id}')
+  .onCreate(notificacionController.creacionTokenController)
+
+exports.enviarNotificacion = functions.firestore
+  .document('posts/{idPost}')
+  .onUpdate(postsController.actualizacionPostController)
+
+exports.validarImagen = functions.storage
+  .object()
+  .onFinalize(postsController.validarImagenPostController)
+
