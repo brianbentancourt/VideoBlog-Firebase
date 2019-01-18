@@ -5,6 +5,8 @@ exports.SMSHelper = (mensaje, numeroCelular) => {
   const SID = functions.config().configuration.accountsidtwilio
   const authToken = functions.config().configuration.authtokentwilio
 
+  //console.log(`SID: ${SID}, authToken: ${authToken}`)
+
   const twilioCliente = new Twilio(SID, authToken)
 
   return twilioCliente.messages.create({

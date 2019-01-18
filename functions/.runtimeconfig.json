@@ -1,6 +1,10 @@
 {
   "configuration": {
     "email": "brianbentancourt9@gmail.com",
-    "password": "your_pass"
+    "password": "your_pass",
+    "claveapihubspot": "your_claveapihubspot",
+    "accountsidtwilio": "your_accountsidtwilio",
+    "numcelularerror": "num_test",
+    "authtokentwilio": "your_authtokentwilio"
   }
 }

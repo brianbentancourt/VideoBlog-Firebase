@@ -70,3 +70,7 @@ exports.enviarPostSemana = functions.https.onRequest(app)
 exports.nuevoErrorApp = functions.crashlytics
   .issue()
   .onNew(errorController.handler)
+
+exports.analiticaCompartir = functions.analytics
+  .event('share')
+  .onLog(analiticasController.enviarCuponCompartir)
